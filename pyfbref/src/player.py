@@ -17,7 +17,7 @@ class Player(object):
         return desc
 
     def get_tables(self):
-        search = player.search_url + "=" + self.name
+        search = Player.search_url + "=" + self.name
         response = requests.get(search)
         comm = re.compile("<!--|-->")
         soup = BeautifulSoup(comm.sub("", response.text), "lxml")
@@ -51,7 +51,7 @@ class Player(object):
             df = pd.DataFrame.from_dict(pre_df_dict)
             df_dict[f'{label}'] = df
 
-        return df_dict
+        self.tables = df_dict
 
 def valid_headers():
     valid = [
@@ -72,5 +72,4 @@ def valid_headers():
 
 if __name__ == "__main__":
     puli = Player("Christian pulisic")
-    #puli.get_table()
-    print(puli)
+    puli.get_tables()
