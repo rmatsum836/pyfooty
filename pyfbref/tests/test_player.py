@@ -18,6 +18,10 @@ class TestPlayer(object):
 
         assert len(player_obj.tables) == 10
 
+    def test_player_float(self):
+        with pytest.raises(TypeError):
+            Player(43)
+
     def test_invalid_player(self):
         """ This won't pass for now"""
         Player('Lebron James').get_tables()
