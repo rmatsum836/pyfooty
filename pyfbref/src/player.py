@@ -1,26 +1,24 @@
 import requests
 import re
 import pandas as pd
+import warnings
 from bs4 import BeautifulSoup
 
 
-class Player(object): 
-    search_url = "https://fbref.com/search/search.fcgi?search"
+class Player(object):
+    fbref_url = "https://fbref.com/search/search.fcgi?search"
 
     def __init__(self, player_name):
         if not isinstance(player_name, str):
             raise TypeError("Player name must be a string")
-        self.name = player_name
+        self.name, self.search_str = _validate_name(Player.fbref_url, player_name)
 
     def __repr__(self):
         desc = "<player: {}, id: {}>".format(self.name, id(self))
         return desc
 
     def get_tables(self):
-        search = Player.search_url + "=" + self.name
-        response = requests.get(search)
-        comm = re.compile("<!--|-->")
-        soup = BeautifulSoup(comm.sub("", response.text), "lxml")
+        soup = _get_soup(Player.fbref_url, self.name, self.search_str)
         all_tables = soup.findAll("tbody")
         all_headers = soup.findAll("div", {"class": "section_heading"})
         head_labels = [
@@ -32,10 +30,10 @@ class Player(object):
         df_dict = dict()
         for table, label in zip(all_tables, head_labels):
             pre_df_dict = dict()
-            rows = table.find_all('tr')
+            rows = table.find_all("tr")
             for row in rows:
-                if row.find('th', {'scope': 'row'}) != None:
-                    cells = row.find_all('td')
+                if row.find("th", {"scope": "row"}) != None:
+                    cells = row.find_all("td")
                     for cell in cells:
                         cell_text = cell.text.encode()
                         text = cell_text.decode("utf-8")
@@ -43,15 +41,16 @@ class Player(object):
                             text = float(text)
                         except ValueError:
                             pass
-                        if cell['data-stat'] in pre_df_dict.keys():
-                            pre_df_dict[cell['data-stat']].append(text)
+                        if cell["data-stat"] in pre_df_dict.keys():
+                            pre_df_dict[cell["data-stat"]].append(text)
                         else:
-                            pre_df_dict[cell['data-stat']] = [text]
+                            pre_df_dict[cell["data-stat"]] = [text]
 
             df = pd.DataFrame.from_dict(pre_df_dict)
-            df_dict[f'{label}'] = df
+            df_dict[f"{label}"] = df
 
         self.tables = df_dict
+
 
 def valid_headers():
     valid = [
@@ -70,6 +69,34 @@ def valid_headers():
     return valid
 
 
+def _get_soup(fbref_url, name, search_str=None):
+    if search_str is None:
+        search_str = fbref_url + "=" + name
+    response = requests.get(search_str)
+    comm = re.compile("<!--|-->")
+    soup = BeautifulSoup(comm.sub("", response.text), "lxml")
+
+    return soup
+
+
+def _validate_name(url, name):
+    search_str = None
+    soup = _get_soup(url, name)
+    strong_str = [i.next_element for i in soup.findAll("strong")]
+    title = soup.find("title")
+    if "0 hits" in strong_str:
+        raise ValueError(f"`{name}` not found in FBRef")
+    if "Search Results" in title.next_element:
+        # Grab first search result
+        search = soup.findAll("div", {"class": "search-item-name"})[0]
+        search_name = search.next_element.next_element.next_element
+        search_str = "https://fbref.com/" + search.a["href"]
+        msg = f"Exact match for {name} not found.  Setting `player_name` to first search result: {search_name}"
+        warnings.warn(msg)
+        name = search_name
+    return name, search_str
+
+
 if __name__ == "__main__":
-    puli = Player("Christian pulisic")
+    puli = Player("Christian Pulisic")
     puli.get_tables()

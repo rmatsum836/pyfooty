@@ -23,5 +23,9 @@ class TestPlayer(object):
             Player(43)
 
     def test_invalid_player(self):
-        """ This won't pass for now"""
-        Player('Lebron James').get_tables()
+        with pytest.raises(ValueError):
+            Player('Lebron James')
+
+    def test_search_warning(self):
+        with pytest.warns(UserWarning):
+            Player('Jorginho')
