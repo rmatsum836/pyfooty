@@ -17,28 +17,38 @@ class Player(object):
         desc = "<player: {}, id: {}>".format(self.name, id(self))
         return desc
 
-    def get_table(self, table_type="standard"):
+    def get_table(self, table_type="Standard Stats"):
         """
         Grab a single table from a player's page
 
         Parameters
         ------------
         table_type : str, default="Standard Stats"
-            Table type to grab from fbref. Valid args include: "Standard Stats",
-            "shooting", "passing", "pass types", "goal and shot creation",
-            "defensive", "possession", "playing time", "miscellaneous", "player
-            club"
+            Table type to grab from fbref. Valid args include: 
+            "Standard Stats",
+            "Shooting",
+            "Passing",
+            "Pass Types",
+            "Goal and Shot Creation",
+            "Defensive Actions",
+            "Possession",
+            "Playing Time",
+            "Miscellaneous Stats",
+            "Player Club Summary"
 
         Returns
         -------
         df : Pandas.DataFrame
             DataFrame of `table_type`
         """
+        if table_type not in valid_headers():
+            raise ValueError(f"Invalid table type requested: {table_type}")
         soup = _get_soup(Player.fbref_url, self.name, self.search_str)
         all_divs = soup.findAll("div", {"class": "table_wrapper"})
-        for div in all_divs:
-            if div.find("span")['data-label'] == table_type:
-                break
+        div = [x for x in all_divs if x.find("span")['data-label'] == table_type]
+        if len(div) == 0:
+            raise ValueError(f"Table type '{table_type}' not found for {self.name}")
+        div = div[0]
         table = div.find("tbody")
         rows = table.find_all("tr")
         pre_df_dict = dict()
