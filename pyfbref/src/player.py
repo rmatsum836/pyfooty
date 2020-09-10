@@ -17,7 +17,60 @@ class Player(object):
         desc = "<player: {}, id: {}>".format(self.name, id(self))
         return desc
 
+    def get_table(self, table_type="standard"):
+        """
+        Grab a single table from a player's page
+
+        Parameters
+        ------------
+        table_type : str, default="Standard Stats"
+            Table type to grab from fbref. Valid args include: "Standard Stats",
+            "shooting", "passing", "pass types", "goal and shot creation",
+            "defensive", "possession", "playing time", "miscellaneous", "player
+            club"
+
+        Returns
+        -------
+        df : Pandas.DataFrame
+            DataFrame of `table_type`
+        """
+        soup = _get_soup(Player.fbref_url, self.name, self.search_str)
+        all_divs = soup.findAll("div", {"class": "table_wrapper"})
+        for div in all_divs:
+            if div.find("span")['data-label'] == table_type:
+                break
+        table = div.find("tbody")
+        rows = table.find_all("tr")
+        pre_df_dict = dict()
+        for row in rows:
+            if row.find("th", {"scope": "row"}) != None:
+                cells = row.find_all("td")
+                for cell in cells:
+                    cell_text = cell.text.encode()
+                    text = cell_text.decode("utf-8")
+                    try:
+                        text = float(text)
+                    except ValueError:
+                        pass
+                    if cell["data-stat"] in pre_df_dict.keys():
+                        pre_df_dict[cell["data-stat"]].append(text)
+                    else:
+                        pre_df_dict[cell["data-stat"]] = [text]
+
+        df = pd.DataFrame.from_dict(pre_df_dict)
+
+        return df
+
+
     def get_tables(self):
+        """
+        Grab all available tables from a player's page
+
+        Returns
+        -------
+        df_dict : dict
+            Dictionary of DataFrame objects
+        """
         soup = _get_soup(Player.fbref_url, self.name, self.search_str)
         all_tables = soup.findAll("tbody")
         all_headers = soup.findAll("div", {"class": "section_heading"})
@@ -99,4 +152,4 @@ def _validate_name(url, name):
 
 if __name__ == "__main__":
     puli = Player("Christian Pulisic")
-    puli.get_tables()
+    standard = puli.get_table()
