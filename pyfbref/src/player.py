@@ -6,6 +6,25 @@ from bs4 import BeautifulSoup
 
 
 class Player(object):
+    """A Player object.
+
+    The Player object represents a soccer player with available data from FBRef.com.
+    
+    Parameters
+    ----------
+    player_name : str
+        Name of player to search on FBRef
+    search_str : str, default=None
+        URL search string for FBRef, set if `player_name` doesn't have exact match
+
+    Attributes
+    ---------
+    player_name : str
+        Name of player to search on FBRef
+    search_str : str, default=None
+        URL search string for FBRef 
+
+    """
     fbref_url = "https://fbref.com/search/search.fcgi?search"
 
     def __init__(self, player_name):
