@@ -1,6 +1,6 @@
 from setuptools import setup
 
-setup(name='pyfbref',
+setup(name='pyfooty',
         version='0.0',
         description='Parse the fbref website with python',
         url='https://github.com/rmatsum836/pyfbref',
