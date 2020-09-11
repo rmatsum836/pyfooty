@@ -31,6 +31,7 @@ class Player(object):
         if not isinstance(player_name, str):
             raise TypeError("Player name must be a string")
         self.name, self.search_str = _validate_name(Player.fbref_url, player_name)
+        self.valid_tables = _get_available_tables(Player.fbref_url, self.name, self.search_str)
 
     def __repr__(self):
         desc = "<player: {}, id: {}>".format(self.name, id(self))
@@ -60,7 +61,7 @@ class Player(object):
         df : Pandas.DataFrame
             DataFrame of `table_type`
         """
-        if table_type not in valid_headers():
+        if table_type not in self.valid_tables:
             raise ValueError(f"Invalid table type requested: {table_type}")
         soup = _get_soup(Player.fbref_url, self.name, self.search_str)
         all_divs = soup.findAll("div", {"class": "table_wrapper"})
@@ -106,7 +107,7 @@ class Player(object):
         head_labels = [
             i.span["data-label"]
             for i in all_headers
-            if i.span["data-label"] in valid_headers()
+            if i.span["data-label"] in self.valid_tables
         ]
 
         df_dict = dict()
@@ -132,23 +133,6 @@ class Player(object):
             df_dict[f"{label}"] = df
 
         self.tables = df_dict
-
-
-def valid_headers():
-    valid = [
-        "Standard Stats",
-        "Shooting",
-        "Passing",
-        "Pass Types",
-        "Goal and Shot Creation",
-        "Defensive Actions",
-        "Possession",
-        "Playing Time",
-        "Miscellaneous Stats",
-        "Player Club Summary",
-    ]
-
-    return valid
 
 
 def _get_soup(fbref_url, name, search_str=None):
@@ -179,6 +163,14 @@ def _validate_name(url, name):
     return name, search_str
 
 
+def _get_available_tables(url, name, search_str):
+    """ Get available tables for specific player"""
+    soup = _get_soup(url, name, search_str)
+    all_divs = soup.findAll("div", {"class": "table_wrapper"})
+    div = tuple([x.find("span")['data-label'] for x in all_divs])
+    return div
+
+
 if __name__ == "__main__":
     puli = Player("Christian Pulisic")
-    standard = puli.get_table()
+    #standard = puli.get_table()
