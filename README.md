@@ -21,4 +21,4 @@ Then the Passing stats can be grabbed by calling the `get_table()` method:
 passing = hazard.get_table("Passing")
 ```
 ### Acknowledgements
-Some code taken from: https://github.com/chmartin/FBref_EPL/edit/master/FBref_scrape.py
+Some code taken from: https://github.com/chmartin/FBref_EPL
