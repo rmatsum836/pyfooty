@@ -9,7 +9,7 @@ class Player(object):
     """A Player object.
 
     The Player object represents a soccer player with available data from FBRef.com.
-    
+
     Parameters
     ----------
     player_name : str
@@ -22,16 +22,19 @@ class Player(object):
     player_name : str
         Name of player to search on FBRef
     search_str : str, default=None
-        URL search string for FBRef 
+        URL search string for FBRef
 
     """
+
     fbref_url = "https://fbref.com/search/search.fcgi?search"
 
     def __init__(self, player_name):
         if not isinstance(player_name, str):
             raise TypeError("Player name must be a string")
         self.name, self.search_str = _validate_name(Player.fbref_url, player_name)
-        self.valid_tables = _get_available_tables(Player.fbref_url, self.name, self.search_str)
+        self.valid_tables = _get_available_tables(
+            Player.fbref_url, self.name, self.search_str
+        )
 
     def __repr__(self):
         desc = "<player: {}, id: {}>".format(self.name, id(self))
@@ -44,7 +47,7 @@ class Player(object):
         Parameters
         ------------
         table_type : str, default="Standard Stats"
-            Table type to grab from fbref. Valid args include: 
+            Table type to grab from fbref. Valid args include:
             "Standard Stats",
             "Shooting",
             "Passing",
@@ -65,7 +68,7 @@ class Player(object):
             raise ValueError(f"Invalid table type requested: {table_type}")
         soup = _get_soup(Player.fbref_url, self.name, self.search_str)
         all_divs = soup.findAll("div", {"class": "table_wrapper"})
-        div = [x for x in all_divs if x.find("span")['data-label'] == table_type]
+        div = [x for x in all_divs if x.find("span")["data-label"] == table_type]
         if len(div) == 0:
             raise ValueError(f"Table type '{table_type}' not found for {self.name}")
         div = div[0]
@@ -90,7 +93,6 @@ class Player(object):
         df = pd.DataFrame.from_dict(pre_df_dict)
 
         return df
-
 
     def get_tables(self):
         """
@@ -167,10 +169,13 @@ def _get_available_tables(url, name, search_str):
     """ Get available tables for specific player"""
     soup = _get_soup(url, name, search_str)
     all_divs = soup.findAll("div", {"class": "table_wrapper"})
-    div = tuple([x.find("span")['data-label'] for x in all_divs])
+    div = tuple([x.find("span")["data-label"] for x in all_divs])
     return div
 
 
 if __name__ == "__main__":
     puli = Player("Christian Pulisic")
-    #standard = puli.get_table()
+    import pdb
+
+    pdb.set_trace()
+    # standard = puli.get_table()
