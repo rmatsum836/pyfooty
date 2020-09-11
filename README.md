@@ -1,6 +1,7 @@
 # PyFooty
 
-PyFooty is a simple Python package to parse soccer stats from ![FBRef](https://fbref.com/en/).
+PyFooty is a simple Python package to parse soccer stats from [FBRef](https://fbref.com/en/).
+<br/>
 Disclaimer: This package is in early stages and API is subject to change.
 
 ## Installation
