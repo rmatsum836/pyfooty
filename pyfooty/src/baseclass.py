@@ -1,7 +1,9 @@
 from abc import ABCMeta, abstractmethod
 
 class AbstractFooty(metaclass = ABCMeta): 
-    """ Abstract class for PyRef data
+    """ Abstract class for PyRef data. Should be inherited for all other
+    classes
+
     """
 
     @property

@@ -20,7 +20,8 @@ class Player(AbstractFooty):
     ---------
     name : str
         Name of player to search on FBRef
-
+    valid_tables : tuple
+        Tuple of valid tables
     """
 
     fbref_url = "https://fbref.com/search/search.fcgi?search"
