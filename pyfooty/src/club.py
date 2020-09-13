@@ -5,33 +5,32 @@ import warnings
 from bs4 import BeautifulSoup
 from pyfooty.src.baseclass import AbstractFooty
 from pyfooty.src.utils import get_soup, get_available_tables
+from datetime import date
 
-
-class Player(AbstractFooty):
-    """A Player object.
-
-    The Player object represents a soccer player with available data from FBRef.com.
-
+class Club(AbstractFooty):
+    """A Club object.
+    The Club object represents a soccer club with available data from FBRef.com.
     Parameters
     ----------
-    player_name : str
-        Name of player to search on FBRef
-
+    club_name : str
+        Name of team to search on FBRef
+    year : int, default=None
     Attributes
     ---------
     name : str
-        Name of player to search on FBRef
+        Name of team to search on FBRef
     valid_tables : tuple
         Tuple of valid tables
     """
-
     fbref_url = "https://fbref.com/search/search.fcgi?search"
 
-    def __init__(self, player_name):
-        self._name = _validate_name(Player.fbref_url, player_name)
-        self._valid_tables = get_available_tables(
-            Player.fbref_url, self.name,
-        )
+    def __init__(self, club_name, year=None):
+        if year:
+            self._year = _validate_year(year)
+        else:
+            self._year = _validate_year(date.today().year)
+        self._name, self._club_url = _validate_name(Club.fbref_url, club_name, self.year)
+        self._valid_tables = get_available_tables(self.club_url)
 
     @property
     def name(self):
@@ -41,13 +40,21 @@ class Player(AbstractFooty):
     def valid_tables(self):
         return self._valid_tables
 
+    @property
+    def club_url(self):
+        return self._club_url
+
+    @property
+    def year(self):
+        return self._year
+
     def __repr__(self):
-        desc = "<player: {}, id: {}>".format(self.name, id(self))
+        desc = "<club: {}, year: {}, id: {}>".format(self.name, self.year, id(self))
         return desc
 
     def get_table(self, table_type="Standard Stats"):
         """
-        Grab a single table from a player's page
+        Grab a single table from a club's page
 
         Parameters
         ------------
@@ -71,7 +78,7 @@ class Player(AbstractFooty):
         """
         if table_type not in self.valid_tables:
             raise ValueError(f"Invalid table type requested: {table_type}")
-        soup = get_soup(Player.fbref_url, self.name)
+        soup = get_soup(self.club_url)
         all_divs = soup.findAll("div", {"class": "table_wrapper"})
         div = [x for x in all_divs if x.find("span")["data-label"] == table_type]
         if len(div) == 0:
@@ -108,7 +115,7 @@ class Player(AbstractFooty):
         df_dict : dict
             Dictionary of DataFrame objects
         """
-        soup = get_soup(Player.fbref_url, self.name)
+        soup = get_soup(self.club_url)
         all_tables = soup.findAll("tbody")
         all_headers = soup.findAll("div", {"class": "section_heading"})
         head_labels = [
@@ -141,25 +148,37 @@ class Player(AbstractFooty):
 
         self.tables = df_dict
 
-
-def _validate_name(url, name):
+def _validate_name(url, name, year=None):
     if not isinstance(name, str):
-        raise TypeError("Player name must be a string")
+        raise TypeError("Search name must be a string")
     soup = get_soup(url, name)
     strong_str = [i.next_element for i in soup.findAll("strong")]
     title = soup.find("title")
     if "0 hits" in strong_str:
         raise ValueError(f"`{name}` not found in FBRef")
     if "Search Results" in title.next_element:
-        # Grab first search result
-        search = soup.findAll("div", {"class": "search-item-alt-names"})[0]
-        search_name = search.contents[0]
-        msg = f"Exact match for {name} not found.  Setting `player_name` to first search result: {search_name}"
+        # Grab first search result for Clubs
+        search = soup.find("div", {"id": "clubs"})
+        search_name = search.find("div", {"search-item-alt-names"}).contents[0]
+        year_url = f"{year}-{year+1}"
+        search_url = "https://fbref.com" + search.find("div", {"search-item-url"}).contents[0].contents[0]
+        actual_url = get_soup(search_url).find("meta", {"property": "og:url"})['content']
+        url_list = actual_url.split('/')
+        url_list.insert(-1, year_url)
+        final_url = '/'.join([i for i in url_list])
+        msg = f"Exact match for {name} not found.  Setting `name` to first search result: {search_name}"
         warnings.warn(msg)
-        name = search_name
-    return name
+    return search_name, final_url
 
+def _validate_year(year):
+    """ Validate year is given as an int"""
+    if not isinstance(year, int):
+        raise TypeError("Year must give of type `int`.")
+    if year <= 1900:
+        raise ValueError("Please enter a year after 1990.")
+
+    return year
 
 if __name__ == "__main__":
-    puli = Player("Jorginho")
-    standard = puli.get_table("Standard Stats")
+    club = Club("Chelsea", 2019)
+    #standard = club.get_table("Standard Stats")
