@@ -159,9 +159,8 @@ def _validate_name(url, name):
         raise ValueError(f"`{name}` not found in FBRef")
     if "Search Results" in title.next_element:
         # Grab first search result
-        search = soup.findAll("div", {"class": "search-item-name"})[0]
-        search_name = search.next_element.next_element.next_element
-        search_str = "https://fbref.com/" + search.a["href"]
+        search = soup.findAll("div", {"class": "search-item-alt-names"})[0]
+        search_name = search.contents[0]
         msg = f"Exact match for {name} not found.  Setting `player_name` to first search result: {search_name}"
         warnings.warn(msg)
         name = search_name
@@ -177,5 +176,5 @@ def _get_available_tables(url, name):
 
 
 if __name__ == "__main__":
-    puli = Player("Lionel Messi")
-    # standard = puli.get_table()
+    puli = Player("Jorginho")
+    standard = puli.get_table("Standard Stats")
