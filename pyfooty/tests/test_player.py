@@ -7,7 +7,7 @@ class TestPlayer(object):
         "player", ("Mason Mount", "Christian Pulisic", "Frank Lampard", "Eden Hazard")
     )
     def test_player_name(self, player):
-        Player(player).name = player
+        assert Player(player).name == player
 
     @pytest.mark.parametrize(
         "player", ("Mason Mount", "Christian Pulisic", "Eden Hazard")
