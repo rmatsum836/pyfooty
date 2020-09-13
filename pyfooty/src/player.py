@@ -4,6 +4,7 @@ import pandas as pd
 import warnings
 from bs4 import BeautifulSoup
 from pyfooty.src.baseclass import AbstractFooty
+from pyfooty.src.utils import get_soup, get_available_tables
 
 
 class Player(AbstractFooty):
