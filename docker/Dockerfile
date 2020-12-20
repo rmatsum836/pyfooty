@@ -14,7 +14,7 @@ RUN apk --update-cache upgrade && \
     -c conda-forge -c anaconda && \
 	echo ". /opt/conda/etc/profile.d/conda.sh" >> /home/anaconda/.bashrc && \
 	echo "conda activate base" >> /home/anaconda/.bashrc && \
-	echo "conda activate pyfooty" >> /home/anaconda/.bashrc && \
+	echo "conda activate soccer" >> /home/anaconda/.bashrc && \
 	conda activate soccer && \
 	cd /software && \
     git clone https://github.com/rmatsum836/pyfooty && \
