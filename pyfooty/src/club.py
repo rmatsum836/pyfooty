@@ -2,6 +2,7 @@ import requests
 import re
 import pandas as pd
 import warnings
+import lxml
 from bs4 import BeautifulSoup
 from pyfooty.src.baseclass import AbstractFooty
 from pyfooty.src.utils import get_soup, get_available_tables
