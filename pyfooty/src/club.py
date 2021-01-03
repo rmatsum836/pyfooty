@@ -158,7 +158,6 @@ class Club(AbstractFooty):
 
         df = pd.DataFrame.from_dict(pre_df_dict)
 
-        import pdb; pdb.set_trace()
         return df
 
     def get_tables(self):
