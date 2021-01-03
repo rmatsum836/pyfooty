@@ -26,3 +26,19 @@ def get_available_tables(url, name=None):
     all_divs = soup.findAll("div", {"class": "table_wrapper"})
     div = tuple([x.find("span")["data-label"] for x in all_divs])
     return div
+
+def get_matchlog_str(table_type):
+    """ Get valid strings to get matchlog data"""
+    matchlog_dict = {
+            "Scores & Fixtures": "schedule",
+            "Shooting": "shooting",
+            "Goalkeeping": "keeper",
+            "Passing": "passing",
+            "Pass Types": "passing_types",
+            "Goal and Shot Creation": "gca",
+            "Defensive Actions": "defense",
+            "Possession": "possession",
+            "Miscellaneous Stats": "misc",
+            }
+
+    return matchlog_dict[table_type]

@@ -5,8 +5,9 @@ import warnings
 import lxml
 from bs4 import BeautifulSoup
 from pyfooty.src.baseclass import AbstractFooty
-from pyfooty.src.utils import get_soup, get_available_tables
+from pyfooty.src.utils import get_soup, get_available_tables, get_matchlog_str
 from datetime import date
+from urllib import parse
 
 class Club(AbstractFooty):
     """A Club object.
@@ -32,6 +33,7 @@ class Club(AbstractFooty):
             self._year = _validate_year(date.today().year)
         self._name, self._club_url = _validate_name(Club.fbref_url, club_name, self.year)
         self._valid_tables = get_available_tables(self.club_url)
+        # TODO: Get matchlog str
 
     @property
     def name(self):
@@ -105,6 +107,58 @@ class Club(AbstractFooty):
 
         df = pd.DataFrame.from_dict(pre_df_dict)
 
+        return df
+
+    def get_matchlog(self, table_type="Scores & Fixtures"):
+        """
+        Grab matchlog data from a club's page
+
+        Parameters
+        ----------
+        table_type : str
+            Name of matchlog data to scrape
+
+        Returns
+        -------
+        df : Pandas DataFrame
+            DataFrame of matchlog data
+        """
+        # TODO: Validate that name is correct
+        split_url = self.club_url.split('/')
+        middle_url = split_url[:-1]
+        # TODO: Figure out better way to get the matchlog data
+        middle_url.append("matchlogs")
+        middle_url.append("all_comps")
+        middle_url.append(get_matchlog_str(table_type))
+        matchlog_url = '/'.join(middle_url)
+
+        soup = get_soup(matchlog_url)
+        all_divs = soup.findAll("div", {"class": "table_wrapper"})
+        div = [x for x in all_divs if x.find("span")["data-label"] == table_type]
+        if len(div) == 0:
+            raise ValueError(f"Table type '{table_type}' not found for {self.name}")
+        div = div[0]
+        table = div.find("tbody")
+        rows = table.find_all("tr")
+        pre_df_dict = dict()
+        for row in rows:
+            if row.find("th", {"scope": "row"}) != None:
+                cells = row.find_all("td")
+                for cell in cells:
+                    cell_text = cell.text.encode()
+                    text = cell_text.decode("utf-8")
+                    try:
+                        text = float(text)
+                    except ValueError:
+                        pass
+                    if cell["data-stat"] in pre_df_dict.keys():
+                        pre_df_dict[cell["data-stat"]].append(text)
+                    else:
+                        pre_df_dict[cell["data-stat"]] = [text]
+
+        df = pd.DataFrame.from_dict(pre_df_dict)
+
+        import pdb; pdb.set_trace()
         return df
 
     def get_tables(self):
