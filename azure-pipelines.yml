@@ -68,4 +68,13 @@ stages:
             displayName: Run Tests
           - bash: |
               source activate test-environment
+              coverage xml
+              codecov --file ./coverage.xml --token c133211d-0140-4aeb-af7e-d8a9aeebfe5f
             condition: and( eq( variables['Agent.OS'], 'Linux' ), eq( variables['python.version'], '3.7' ) )
+          - task: PublishCodeCoverageResults@1
+            inputs:
+              codeCoverageTool: Cobertura
+              summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+              reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
+            condition: and( eq( variables['Agent.OS'], 'Linux' ), eq( variables['python.version'], '3.7' ) )
+            displayName: Publish Coverage Report
