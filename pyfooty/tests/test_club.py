@@ -1,10 +1,9 @@
 import pytest
 from pyfooty.src.club import Club
 
+
 class TestClub(object):
-    @pytest.mark.parametrize(
-        "club_name", ("Chelsea", "Real Madrid", "Barcelona")
-    )
+    @pytest.mark.parametrize("club_name", ("Chelsea", "Real Madrid", "Barcelona"))
     def test_club_name(self, club_name):
         assert club_name in Club(club_name).name
 
@@ -16,6 +15,24 @@ class TestClub(object):
         club_obj = Club("Chelsea FC", 2019)
 
         assert len(club_obj.valid_tables) == 13
+
+    @pytest.mark.parametrize(
+        "table_type",
+        (
+            "Shooting",
+            "Scores & Fixtures",
+            "Goalkeeping",
+            "Passing",
+            "Pass Types",
+            "Goal and Shot Creation",
+            "Defensive Actions",
+            "Possession",
+            "Miscellaneous Stats",
+        ),
+    )
+    def test_club_matchlog(self, table_type):
+        club_obj = Club("Chelsea FC", 2019)
+        club_obj.get_matchlog(table_type)
 
     def test_club_float(self):
         with pytest.raises(TypeError):
