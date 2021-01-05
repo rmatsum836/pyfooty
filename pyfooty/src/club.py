@@ -232,7 +232,3 @@ def _validate_year(year):
         raise ValueError("Please enter a year after 1990.")
 
     return year
-
-if __name__ == "__main__":
-    club = Club("Chelsea", 2019)
-    #standard = club.get_table("Standard Stats")
