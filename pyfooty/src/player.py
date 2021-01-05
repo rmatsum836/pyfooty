@@ -158,8 +158,3 @@ def _validate_name(url, name):
         warnings.warn(msg)
         name = search_name
     return name
-
-
-if __name__ == "__main__":
-    puli = Player("Jorginho")
-    standard = puli.get_table("Standard Stats")

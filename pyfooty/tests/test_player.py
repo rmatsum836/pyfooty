@@ -64,3 +64,7 @@ class TestPlayer(object):
 
     def test_repr(self):
         print(Player("Cristiano Ronaldo"))
+
+    def test_invalid_table(self):
+        with pytest.raises(ValueError):
+            Player("Kai Havertz").get_table("pitches")
