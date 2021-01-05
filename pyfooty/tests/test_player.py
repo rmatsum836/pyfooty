@@ -61,3 +61,10 @@ class TestPlayer(object):
 
     def test_valid_tables(self):
         assert len(Player("Frank Lampard").valid_tables) == 5
+
+    def test_repr(self):
+        print(Player("Cristiano Ronaldo"))
+
+    def test_invalid_table(self):
+        with pytest.raises(ValueError):
+            Player("Kai Havertz").get_table("pitches")

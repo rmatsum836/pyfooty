@@ -47,3 +47,20 @@ class TestClub(object):
     def test_get_club_table(self):
         chelsea = Club("Chelsea FC", 2019)
         chelsea.get_table("Standard Stats")
+
+    def test_get_all_tables(self):
+        manu = Club("Manchester United", 1999)
+        manu.get_tables()
+
+    def test_invalid_club(self):
+        with pytest.raises(ValueError):
+            Club("Charlotte Hornets")
+
+    def test_invalid_table(self):
+        juventus = Club("Juventus", 2008)
+        with pytest.raises(ValueError):
+            juventus.get_table("Free throws")
+
+    def test_club_repr(self):
+        juventus = Club("Juventus", 2008)
+        print(juventus)
