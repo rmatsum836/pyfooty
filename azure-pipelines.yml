@@ -64,7 +64,7 @@ stages:
           - bash: |
               source activate test-environment
               pip install pytest-azurepipelines
-              python -m pytest -v --pyargs pyfooty
+              python -m pytest -v --pyargs pyfooty --cov=./
             displayName: Run Tests
           - bash: |
               source activate test-environment
