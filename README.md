@@ -1,5 +1,6 @@
 # PyFooty
 [![Build Status](https://dev.azure.com/rayamatsumoto/pyfooty/_apis/build/status/rmatsum836.pyfooty?branchName=master)](https://dev.azure.com/rayamatsumoto/pyfooty/_build/latest?definitionId=3&branchName=master)
+[![codecov](https://codecov.io/gh/rmatsum836/pyfooty/branch/master/graph/badge.svg)](https://codecov.io/gh/rmatsum836/pyfooty)
 
 <br>
 
