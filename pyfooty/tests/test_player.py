@@ -61,3 +61,6 @@ class TestPlayer(object):
 
     def test_valid_tables(self):
         assert len(Player("Frank Lampard").valid_tables) == 5
+
+    def test_repr(self):
+        print(Player("Cristiano Ronaldo"))
