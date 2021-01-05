@@ -60,3 +60,7 @@ class TestClub(object):
         juventus = Club("Juventus", 2008)
         with pytest.raises(ValueError):
             juventus.get_table("Free throws")
+
+    def test_club_repr(self):
+        juventus = Club("Juventus", 2008)
+        print(juventus)
